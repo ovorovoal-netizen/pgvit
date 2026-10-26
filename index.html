@@ -3,47 +3,40 @@
 
 <script src="https://unpkg.com"></script>
 <script>
-    // Инициализируем карту
-    const map = L.map('map').setView([53.9000, 27.5667], 13);
+    // Создаем карту Минска
+    const map = L.map('map').setView([53.9000, 27.5667], 12);
 
-    // Подключаем карту улиц
+    // Подгружаем подложку дорог
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
     }).addTo(map);
 
-    // Список ваших точек (Координаты в формате [долгота, широта])
+    // Список ваших точек
     const myPoints = [
-      {
-        "type": "Feature",
-        "properties": { "name": "Гидрант №1", "info": "Улица Ленина, д. 5" },
-        "geometry": { "type": "Point", "coordinates": [27.5615, 53.9023] } 
-      },
-      {
-        "type": "Feature",
-        "properties": { "name": "Гидрант №2", "info": "Проспект Независимости, д. 12" },
-        "geometry": { "type": "Point", "coordinates": [27.5670, 53.9005] } 
-      }
+        { "lat": 53.9023, "lng": 27.5615, "name": "Гидрант №1", "info": "ул. Ленина, 5" },
+        { "lat": 53.9005, "lng": 27.5670, "name": "Гидрант №2", "info": "пр. Независимости, 12" }
     ];
 
-    // Перебираем точки и ставим маркеры
-    myPoints.forEach(point => {
-        const lng = point.geometry.coordinates[0];
-        const lat = point.geometry.coordinates[1];
-        
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>${point.properties.name}</b><br>${point.properties.info}`);
+    // Расставляем их на карте простым циклом
+    myPoints.forEach(function(point) {
+        L.marker([point.lat, point.lng])
+            .addTo(map)
+            .bindPopup("<b>" + point.name + "</b><br>" + point.info);
     });
 
-    // Функция GPS
+    // Геолокация
     let userMarker = null;
     function findMyLocation() {
-        map.locate({setView: true, maxZoom: 17});
+        map.locate({setView: true, maxZoom: 16});
     }
     map.on('locationfound', function(e) {
         if (userMarker) {
             userMarker.setLatLng(e.latlng);
         } else {
-            userMarker = L.circleMarker(e.latlng, { radius: 9, fillColor: '#007bff', color: '#fff', weight: 3 }).addTo(map);
+            userMarker = L.circleMarker(e.latlng, { radius: 8, fillColor: '#007bff', color: '#fff', weight: 2 }).addTo(map);
         }
+    });
+    map.on('locationerror', function() {
+        alert("Включите GPS геопозицию");
     });
 </script>
