@@ -1,0 +1,42 @@
+map<div id="map"></div>
+<button class="geo-btn" onclick="findMyLocation()">📍</button>
+
+<script src="https://unpkg.com"></script>
+<script>
+    // Создаем карту Минска
+    const map = L.map('map').setView([53.9000, 27.5667], 12);
+
+    // Подгружаем подложку дорог
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    // Список ваших точек
+    const myPoints = [
+        { "lat": 53.9023, "lng": 27.5615, "name": "Гидрант №1", "info": "ул. Ленина, 5" },
+        { "lat": 53.9005, "lng": 27.5670, "name": "Гидрант №2", "info": "пр. Независимости, 12" }
+    ];
+
+    // Расставляем их на карте простым циклом
+    myPoints.forEach(function(point) {
+        L.marker([point.lat, point.lng])
+            .addTo(map)
+            .bindPopup("<b>" + point.name + "</b><br>" + point.info);
+    });
+
+    // Геолокация
+    let userMarker = null;
+    function findMyLocation() {
+        map.locate({setView: true, maxZoom: 16});
+    }
+    map.on('locationfound', function(e) {
+        if (userMarker) {
+            userMarker.setLatLng(e.latlng);
+        } else {
+            userMarker = L.circleMarker(e.latlng, { radius: 8, fillColor: '#007bff', color: '#fff', weight: 2 }).addTo(map);
+        }
+    });
+    map.on('locationerror', function() {
+        alert("Включите GPS геопозицию");
+    });
+</script>
